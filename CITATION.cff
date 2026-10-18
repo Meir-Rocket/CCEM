@@ -1,0 +1,55 @@
+cff-version: 1.2.0
+message: "If you use this code, please cite the paper below."
+title: "Convex Compositional Reasoning Models"
+authors:
+  - family-names: Roketlishvili
+    given-names: Meir
+  - family-names: Semenov
+    given-names: Semyon
+  - family-names: Bobrin
+    given-names: Maksim
+  - family-names: Kovalchuk
+    given-names: Viktor
+  - family-names: Baichorov
+    given-names: Albert
+  - family-names: Shtanchaev
+    given-names: Abduragim
+  - family-names: Karray
+    given-names: Fakhri
+  - family-names: Dylov
+    given-names: Dmitry V.
+  - family-names: Takáč
+    given-names: Martin
+  - family-names: Asadulaev
+    given-names: Arip
+version: 1.0.0
+identifiers:
+  - type: other
+    value: "arXiv:2605.23395"
+url: "https://arxiv.org/abs/2605.23395"
+preferred-citation:
+  type: conference-paper
+  title: "Convex Compositional Reasoning Models"
+  collection-title: "Advances in Neural Information Processing Systems (NeurIPS)"
+  year: 2026
+  authors:
+    - family-names: Roketlishvili
+      given-names: Meir
+    - family-names: Semenov
+      given-names: Semyon
+    - family-names: Bobrin
+      given-names: Maksim
+    - family-names: Kovalchuk
+      given-names: Viktor
+    - family-names: Baichorov
+      given-names: Albert
+    - family-names: Shtanchaev
+      given-names: Abduragim
+    - family-names: Karray
+      given-names: Fakhri
+    - family-names: Dylov
+      given-names: Dmitry V.
+    - family-names: Takáč
+      given-names: Martin
+    - family-names: Asadulaev
+      given-names: Arip

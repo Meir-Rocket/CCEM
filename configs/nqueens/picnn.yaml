@@ -1,0 +1,67 @@
+# N-Queens PICNN factor energy: one shared line energy for the rows,
+# columns and diagonals of a board, trained in two phases (Phase 1:
+# InfoNCE on synthetic lines; Phase 2: fine-tuning through the unrolled
+# projected-Adam solver on one solution board) and evaluated with
+# multi-start projected Adam over the Birkhoff polytope.
+#
+# Paths containing {board_size} are filled in from board_size (or
+# --board-size N), which selects the sized data files and checkpoint.
+# Training writes to output_path, a *_retrained.pt file next to the
+# shipped checkpoint, which is never overwritten; evaluation reads
+# `checkpoint`.
+seed: 0
+device: cuda  # falls back to CPU when CUDA is unavailable
+board_size: 8
+board_train_path: data/nqueens/{board_size}_queens_train.txt
+test_path: data/nqueens/{board_size}_queens_all.txt  # known-solution set
+checkpoint: checkpoints/nqueens/picnn_n{board_size}.pt
+output_path: checkpoints/nqueens/picnn_n{board_size}_retrained.pt
+factor_types: [row, col, diag, anti]
+model:
+  hidden_dim: 256
+  depth: 3
+  activation: softplus
+# The training block holds the values embedded in the shipped
+# checkpoints (Phase 1: 1000 local epochs of InfoNCE with 5 negatives;
+# Phase 2: 1000 board epochs unrolling 64 projected-Adam steps from 16
+# starts with the rank + hard-negative loss, loss weights
+# (mse, rank, hard) = (0, 2, 1)).
+training:
+  batch_size: 32
+  lr: 1.0e-4
+  weight_decay: 1.0e-4
+  negatives_per_positive: 5
+  local_epochs: 1000
+  board_finetune_epochs: 1000
+  board_batch_size: 64
+  board_unroll_steps: 64
+  board_unroll_step_size: 0.015
+  board_unroll_step_size_final: 0.002
+  board_solver_optimizer: adam
+  board_num_starts: 16
+  board_step_schedule: cosine
+  board_mse_weight: 0.0
+  board_rank_weight: 2.0
+  board_rank_margin: 0.1
+  board_hard_negative_count: 12
+  board_hard_negative_weight: 1.0
+  board_hard_negative_margin: 0.2
+  board_tie_break_weight: 1.0e-4
+  board_augment_symmetries: true
+# Inference: projected Adam over the Birkhoff polytope, T = 140 steps
+# (the value embedded in every shipped checkpoint and used in the paper).
+solver:
+  steps: 140
+  step_size: 0.001
+  step_size_final: 0.0002
+  optimizer: adam
+  num_starts: 64
+  step_schedule: cosine
+  adam_beta1: 0.9
+  adam_beta2: 0.999
+  adam_eps: 1.0e-8
+  tie_break_weight: 1.0e-4
+  simplex_iters: 50
+eval:
+  num_samples: 100
+  batch_size: 512

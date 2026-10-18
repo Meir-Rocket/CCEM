@@ -1,0 +1,45 @@
+# Graph coloring with a composed per-edge PICNN factor.
+#
+# `python scripts/evaluate.py graph_coloring` loads `checkpoint` and
+# runs the `solver:` block on every graph of `test_path`,
+# eval.num_samples trials per graph (the paper's protocol: 140
+# projected-Adam steps, 64 starts, 20 trials); pick another instance
+# file under data/graph_coloring/ with --test-path.
+# `python scripts/train.py graph_coloring` writes `output_path` (never
+# the shipped checkpoint); the `training:` block holds the values
+# embedded in checkpoints/graph_coloring/picnn_k14.pt.
+seed: 0
+device: cpu
+num_colors: 14
+checkpoint: checkpoints/graph_coloring/picnn_k14.pt
+output_path: checkpoints/graph_coloring/picnn_k14_retrained.pt
+test_path: data/graph_coloring/erdos_renyi.json
+model:
+  hidden_dim: 128
+  depth: 3
+  activation: relu
+training:
+  # InfoNCE on random edge samples (EdgeColorDataset in data.py).
+  batch_size: 256
+  lr: 1.0e-3
+  weight_decay: 1.0e-4
+  negatives_per_positive: 4
+  same_color_fraction: 0.5
+  perturbation_fraction: 0.3
+  swap_fraction: 0.2
+  local_epochs: 200
+  local_samples_per_epoch: 8192
+  local_valid_samples: 1024
+solver:
+  steps: 140
+  step_size: 0.05
+  step_size_final: 0.005
+  step_schedule: cosine
+  optimizer: adam
+  num_starts: 64
+  adam_beta1: 0.9
+  adam_beta2: 0.999
+  adam_eps: 1.0e-8
+  tie_break_weight: 1.0e-4
+eval:
+  num_samples: 20

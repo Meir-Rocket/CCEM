@@ -1,0 +1,60 @@
+# 3-SAT: one PICNN clause factor trained in two phases (local clause
+# pairs, then formula fine-tuning through the unrolled solver) on
+# data/sat3/train.npz and decoded on data/sat3/test.npz.
+# Shipped checkpoint: checkpoints/sat3/picnn.pt. Retraining writes
+# output_path, so the shipped file is never overwritten.
+#   python scripts/train.py sat3
+#   python scripts/evaluate.py sat3
+seed: 0
+device: cuda  # falls back to CPU when CUDA is unavailable
+
+train_path: data/sat3/train.npz
+valid_path: data/sat3/valid.npz
+test_path: data/sat3/test.npz
+checkpoint: checkpoints/sat3/picnn.pt
+output_path: checkpoints/sat3/picnn_retrained.pt
+
+model:
+  hidden_dim: 128
+  depth: 2
+  activation: softplus
+
+training:
+  # Phase 1: local clause factor on (satisfying, falsifying) pairs.
+  epochs: 15
+  batch_size: 2048
+  lr: 1.0e-3
+  weight_decay: 1.0e-5
+  positive_weight: 1.0
+  negative_weight: 1.0
+  margin_weight: 0.25
+  margin: 1.0
+  log_every: 5
+  # Phase 2: formula-level fine-tuning through the unrolled solver.
+  # It unrolls and validates with a single start; the solver block's
+  # num_starts is the inference setting.
+  formula_finetune_epochs: 30
+  formula_batch_size: 64
+  formula_valid_batch_size: 128
+  formula_lr: 1.0e-4
+  formula_weight_decay: 0.0
+  formula_grad_clip: 1.0
+  formula_backprop_steps: 64
+  formula_soft_clause_weight: 1.0
+  formula_clause_margin_weight: 0.25
+  formula_clause_confidence_margin: 0.75
+  formula_worst_clause_weight: 0.25
+  formula_early_stopping_patience: 0
+  formula_validation_seed: 10000
+
+solver:
+  steps: 192
+  step_size: 0.015
+  num_starts: 32
+  optimizer: pgd
+  discrete_steps: 64
+  discrete_tolerance: 1.0e-6
+
+eval:
+  batch_size: 128
+  num_formulas: 0  # 0 = the whole file

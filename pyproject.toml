@@ -1,0 +1,60 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ccem"
+version = "1.0.0"
+description = "Convex Compositional Energy Minimization (CCEM): reference implementation for the NeurIPS 2026 paper 'Convex Compositional Reasoning Models'."
+readme = "README.md"
+requires-python = ">=3.10"
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [{ name = "The CCEM authors" }]
+keywords = [
+    "energy-based models",
+    "input-convex neural networks",
+    "compositional reasoning",
+    "combinatorial optimization",
+]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+dependencies = [
+    "torch>=2.1",
+    "numpy>=1.24",
+    "pyyaml>=6.0",
+    "tqdm>=4.66",
+]
+
+[project.optional-dependencies]
+dev = ["ruff>=0.6", "mypy>=1.10", "types-PyYAML", "types-tqdm"]
+
+[project.urls]
+Paper = "https://arxiv.org/abs/2605.23395"
+
+[tool.setuptools.packages.find]
+include = ["ccem*"]
+
+[tool.ruff]
+target-version = "py310"
+line-length = 79
+extend-exclude = [".venv", "data", "checkpoints"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "UP", "B", "ANN", "SIM", "RUF"]
+ignore = ["ANN401", "UP007", "UP045"]
+
+[tool.ruff.lint.pycodestyle]
+max-doc-length = 72
+
+[tool.ruff.format]
+quote-style = "single"
+
+[tool.mypy]
+python_version = "3.10"
+strict = true
+ignore_missing_imports = true
+files = ["ccem", "scripts"]
